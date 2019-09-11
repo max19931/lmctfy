@@ -1,17 +1,3 @@
-// Copyright 2014 Google Inc. All Rights Reserved.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 #include "lmctfy/resources/memory_resource_handler.h"
 
 #include <memory>
@@ -57,23 +43,13 @@ static const int32 kDefaultDirtyBackgroundRatio = 10;
 static const Bytes kDefaultDirtyLimit = Bytes(0);
 static const Bytes kDefaultDirtyBackgroundLimit = Bytes(0);
 
-StatusOr<MemoryResourceHandlerFactory *> MemoryResourceHandlerFactory::New(
-    CgroupFactory *cgroup_factory, const KernelApi *kernel,
-    EventFdNotifications *eventfd_notifications) {
-  // Memory hierarchy must be mounted.
+StatusOr<MemoryResourceHandlerFactory *> MemoryResourceHandlerFactory::New(CgroupFactory *cgroup_factory, const KernelApi *kernel,EventFdNotifications *eventfd_notifications) {
   if (!cgroup_factory->IsMounted(MemoryControllerFactory::HierarchyType())) {
-    return Status(::util::error::NOT_FOUND,
-                  "Memory resource depends on the memory cgroup hierarchy");
+    return Status(::util::error::NOT_FOUND,"Memory resource depends on the memory cgroup hierarchy");
   }
-
-  // Create memory controller.
-  MemoryControllerFactory *memory_controller = new MemoryControllerFactory(
-      cgroup_factory, kernel, eventfd_notifications);
-
-  return new MemoryResourceHandlerFactory(memory_controller, cgroup_factory,
-                                          kernel);
+  MemoryControllerFactory *memory_controller = new MemoryControllerFactory(cgroup_factory, kernel, eventfd_notifications);
+  return new MemoryResourceHandlerFactory(memory_controller, cgroup_factory,kernel);
 }
-
 MemoryResourceHandlerFactory::MemoryResourceHandlerFactory(
     const MemoryControllerFactory *memory_controller_factory,
     CgroupFactory *cgroup_factory, const KernelApi *kernel)
